@@ -18,7 +18,7 @@
             owner = "casper-ecosystem";
             repo = "cargo-casper";
             rev = "abc9cf9a9e7394a3f36d330cb8ca53bbce99ffce";
-            sha256 = pkgs.lib.fakeSha256;
+            sha256 = "sha256-iJai8KN4i8Rr/hGnWxqaRKggww7tBDCI6WNBQQjS0jQ=";
           };
 
           casper_client = pkgs.fetchFromGitHub {
@@ -32,10 +32,24 @@
           packages = {
             client = buildRustPackage rec {
               pname = "casper-client";
-              version = "0.0.1";
+              version = "v2.0.0";
               src = casper_client;
-              cargoLock = { lockFile = src + ./Cargo.lock; };
-
+              doCheck = false;
+              cargoHash = pkgs.lib.fakeHash;
+              buildInputs = with pkgs; [ openssl ];
+              nativeBuildInputs = with pkgs; [ pkg-config ];
+              PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+            };
+            cargo_casper = buildRustPackage rec {
+              pname = "cargo-casper";
+              version = "v2.0.0";
+              src = cargo_casper;
+              # cargoHash = pkgs.lib.fakeHash;
+              doCheck = false;
+              cargoLock = { lockFile = src + /Cargo.lock; };
+              buildInputs = with pkgs; [ openssl ];
+              nativeBuildInputs = with pkgs; [ pkg-config ];
+              PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
             };
           };
         };
